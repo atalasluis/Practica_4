@@ -49,7 +49,6 @@ Base de datos:
 | barrierClosed  | Boolean | barrera activada     |
 | alarmActivated | Boolean | alarma activada      |
 | deviceId       | String  | identificación ESP32 |
-| processingMode | String  | edge/cloud           |no usar
 | hour           | Number  | análisis horario     |
 | day            | String  | análisis semanal     |
 
