@@ -1,0 +1,115 @@
+
+shadow
+
+{
+  "state": {
+    "reported": {
+      "speed": 42,
+      "speedLimit": 30,
+      "barrier": "closed",
+      "alarm": true,
+      "systemStatus": "online"
+    }
+  }
+}
+
+Ejemplos MUY buenos para demo:
+
+    Alexa, cuál fue la última velocidad detectada
+
+    Alexa, cambia el límite de velocidad a 20
+
+    Alexa, abre la barrera
+
+    Alexa, el sistema está en alarma?
+
+Topics
+
+    speed-monitor/data
+    speed-monitor/events
+    speed-monitor/alarm
+    speed-monitor/shadow/update
+
+Publicación basada en eventos
+
+    evento ocurre → publicar
+
+    Justificación académica:
+    El Shadow se utiliza para representar el estado actual del dispositivo y no como mecanismo de almacenamiento histórico o streaming continuo, reduciendo tráfico MQTT y costos cloud.
+
+Base de datos:
+
+| Campo          | Tipo    | Uso                  |
+| -------------- | ------- | -------------------- |
+| eventId        | String  | ID único             |
+| timestamp      | String  | fecha/hora           |
+| speed          | Number  | velocidad detectada  |
+| exceeded       | Boolean | excedió límite       |
+| speedLimit     | Number  | límite vigente       |
+| barrierClosed  | Boolean | barrera activada     |
+| alarmActivated | Boolean | alarma activada      |
+| deviceId       | String  | identificación ESP32 |
+| processingMode | String  | edge/cloud           |no usar
+| hour           | Number  | análisis horario     |
+| day            | String  | análisis semanal     |
+
+
+¿Por qué guardar "hour"?
+
+    Porque luego puedes hacer:
+
+    * horas con más infracciones
+    * histogramas
+    * frecuencia temporal
+
+    SIN recalcular siempre.
+
+¿Por qué guardar "day"?
+
+    Porque luego podrás:
+
+    * comparar días
+    * patrones semanales
+    * fines de semana.
+
+¿Cuántas tablas usar?
+    Recomendación para Free Tier:
+    SOLO UNA TABLA
+
+    SpeedEvents
+
+¿Por qué?
+
+    Porque:
+
+        simplifica arquitectura
+        simplifica consultas
+        reduce complejidad
+        suficiente para la práctica.
+
+Qué puedes analizar con UNA tabla
+
+    Fácilmente:
+
+        horas con más infracciones
+        velocidad promedio
+        frecuencia de exceso
+        cantidad de alarmas
+        cantidad de cierres barrera
+        efectividad sistema
+        comparación antes/después
+
+¿Qué es systemStatus?
+
+    systemStatus representa:
+
+        el estado operativo general del dispositivo
+
+    Recomiendo algo SIMPLE:
+
+        | Valor  | Uso              |
+        | ------ | ---------------- |
+        | online | normal           |
+        | alarm  | exceso detectado |
+        | error  | fallo sensor     |
+
