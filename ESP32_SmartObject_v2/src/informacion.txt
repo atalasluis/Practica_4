@@ -47,7 +47,7 @@ Base de datos:
 | -------------- | ------- | -------------------- |
 | eventId        | String  | ID único             |
 | timestamp      | String  | fecha/hora           |
-| speed          | Number  | velocidad detectada  |
+| currentSpeedspeed | Number  | velocidad detectada  |
 | exceeded       | Boolean | excedió límite       |
 | speedLimit     | Number  | límite vigente       |
 | barrierClosed  | Boolean | barrera activada     |
