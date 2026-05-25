@@ -19,18 +19,18 @@
 // WIFI
 // =====================
 
-const char* ssid = "TU_WIFI";
-const char* password = "TU_PASSWORD";
+const char* ssid = "Susana";
+const char* password = "12345678";
 
 // =====================
 // AWS
 // =====================
 
 const char* endpoint =
-"a3pyx84p269dfq-ats.iot.us-east-1.amazonaws.com";
+"a3pyx84p269dfq-ats.iot.us-east-2.amazonaws.com";
 
 const char* thingName =
-"speed-monitor-01";
+"thing_test_velocidad";
 
 // =====================
 // HC-SR04
@@ -41,8 +41,8 @@ const char* thingName =
 #define ECHO1 19
 
 // SENSOR 2
-#define TRIG2 23
-#define ECHO2 5
+#define TRIG2 16
+#define ECHO2 35
 
 // =====================
 // DISPLAY I2C
@@ -61,7 +61,7 @@ const char* thingName =
 // BUZZER + LEDS
 // =====================
 
-#define BUZZER_PIN 27
+#define BUZZER_PIN 32 
 
 #define LED1_PIN 26
 #define LED2_PIN 25
@@ -87,7 +87,7 @@ SensorManager sensors(
 
 SpeedManager speedManager(
     sensors,
-    0.40, // distancia entre sensores (m)
+    0.12, // distancia entre sensores (m)
     15    // umbral detección (cm)
 );
 
@@ -97,7 +97,7 @@ BarrierManager barrier(
     0
 );
 
-AlarmManager alarm(
+AlarmManager alarmManager(
     BUZZER_PIN,
     LED1_PIN,
     LED2_PIN
@@ -129,10 +129,11 @@ void setup() {
 
     // WIFI
     wifi.connect();
-
+    delay(3000);
+    Serial.println("Continuando setup...");
     // AWS
     aws.init();
-
+    //aws.connect();
     // SENSORES
     sensors.init();
 
@@ -146,7 +147,7 @@ void setup() {
     barrier.init();
 
     // ALARMA
-    alarm.init();
+    alarmManager.init();
 
     display.setLine1("System Init");
     display.setLine2("Starting...");
@@ -171,14 +172,7 @@ void loop() {
         wifi.isConnected()
     );
 
-    // =====================
-    // AWS
-    // =====================
 
-    if (wifi.isConnected()) {
-
-        aws.loop();
-    }
 
     // =====================
     // SPEED
@@ -208,41 +202,37 @@ void loop() {
         bool exceeded =
             speed > speedLimit;
 
-        // =====================
         // DISPLAY
-        // =====================
 
         display.showSpeed(
             speed,
             speedLimit
         );
 
-        // =====================
         // ALARMA
-        // =====================
 
         if (exceeded) {
 
-            alarm.activate();
+            alarmManager.activate();
 
             barrier.close();
 
             display.showAlarm();
-        }
-        else {
 
-            alarm.deactivate();
+        } else {
+
+            alarmManager.deactivate();
 
             barrier.open();
 
             display.showNormal();
         }
 
-        // =====================
-        // DEVICE STATE
-        // =====================
+        // STATE
 
         DeviceState state;
+
+        state.deviceId = "speed-01";
 
         state.currentSpeed = speed;
 
@@ -250,33 +240,32 @@ void loop() {
 
         state.alarm = exceeded;
 
-        state.barrierClosed =
-            exceeded;
+        state.barrierClosed = exceeded;
 
         state.systemStatus =
             exceeded ? "alarm"
                       : "online";
 
-        // =====================
-        // SHADOW
-        // =====================
+        // PUBLICAR
 
-        if (wifi.isConnected()) {
+        if (
+            wifi.isConnected()
+            &&
+            aws.isConnected()
+        ) {
 
             aws.publishState(state);
         }
 
-        // =====================
-        // EVENTO HISTORICO
-        // =====================
+        // EVENTO
 
         SpeedEvent event;
 
         event.deviceId =
             thingName;
 
-        event.speed =
-            speed;
+        //event.speed =
+            //speed;
 
         event.speedLimit =
             speedLimit;
@@ -304,10 +293,21 @@ void loop() {
     }
 
     // =====================
-    // UPDATE COMPONENTS
+    // UPDATE
     // =====================
 
-    alarm.update();
+    alarmManager.update();
 
     display.update();
+
+    // =====================
+    // AWS
+    // =====================
+
+    if (wifi.isConnected()) {
+
+        aws.loop(); // SIEMPRE
+    }
+
+    delay(10);
 }

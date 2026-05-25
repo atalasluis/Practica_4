@@ -4,6 +4,7 @@
 #include <PubSubClient.h>
 
 struct DeviceState {
+    String deviceId;
     float currentSpeed;
     int speedLimit;
 
@@ -17,6 +18,8 @@ class AWSManager {
 private:
     WiFiClientSecure net;
     PubSubClient client;
+
+    
 
     const char* endpoint;
     const char* thingName;
@@ -53,4 +56,6 @@ public:
     void publishState(DeviceState state);
 
     int desiredSpeedLimit;
+
+    bool isConnected(); 
 };

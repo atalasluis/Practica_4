@@ -1,32 +1,134 @@
-#include "SensorManager.h"
+#include "SpeedManager.h"
 
-SensorManager::SensorManager(
-    int trig1, int echo1,
-    int trig2, int echo2
+SpeedManager::SpeedManager(
+    SensorManager& sensorManager,
+    float distanceMeters,
+    int threshold
 )
-: sensor1(trig1, echo1),
-  sensor2(trig2, echo2) {
+: sensors(sensorManager) {
 
-    lastReadTime = 0;
+    sensorDistance = distanceMeters;
+
+    thresholdDistance = threshold;
+
+    waitingSecondSensor = false;
+
+    t1 = 0;
+    t2 = 0;
+
+    lastSpeed = -1;
 }
 
-void SensorManager::init() {
-    sensor1.init();
-    sensor2.init();
-}
+void SpeedManager::update() {
 
-long SensorManager::getDistance1() {
-    return sensor1.medir();
-}
+    long d1 = sensors.getDistance1Fast();
+    long d2 = sensors.getDistance2Fast();
 
-long SensorManager::getDistance2() {
+    // DEBUG
+    Serial.print("D1: ");
+    Serial.print(d1);
 
-    // Evita interferencia ultrasónica
-    if (millis() - lastReadTime < readDelay) {
-        delay(readDelay);
+    Serial.print(" | D2: ");
+    Serial.println(d2);
+
+    // =====================
+    // SENSOR 1
+    // =====================
+
+    if (
+        !waitingSecondSensor &&
+        d1 > 0 &&
+        d1 < thresholdDistance
+    ) {
+
+        t1 = micros();
+
+        waitingSecondSensor = true;
+
+        return;
     }
 
-    lastReadTime = millis();
+    // =====================
+    // TIMEOUT
+    // =====================
 
-    return sensor2.medir();
+    if (
+        waitingSecondSensor &&
+        micros() - t1 > 2000000
+    ) {
+
+        waitingSecondSensor = false;
+
+        return;
+    }
+
+    // =====================
+    // SENSOR 2
+    // =====================
+
+    if (
+        waitingSecondSensor &&
+        d2 > 0 &&
+        d2 < thresholdDistance
+    ) {
+
+        t2 = micros();
+
+        float deltaTime =
+            (t2 - t1) / 1000000.0;
+
+        waitingSecondSensor = false;
+
+        // INVALIDO
+        if(deltaTime <= 0) {
+            return;
+        }
+
+        // MUY RAPIDO = ERROR
+        if(deltaTime < 0.05) {
+            return;
+        }
+
+        float speedMS =
+            sensorDistance / deltaTime;
+
+        float speedKMH =
+            speedMS * 3.6;
+
+        // FILTRO MAXIMO
+        if(speedKMH > 120) {
+            return;
+        }
+
+        // FILTRO MINIMO
+        if(speedKMH < 2) {
+            return;
+        }
+
+        lastSpeed = speedKMH;
+
+        Serial.print("SPEED: ");
+        Serial.println(lastSpeed);
+    }
+}
+
+bool SpeedManager::hasNewMeasurement() {
+
+    return lastSpeed > 0;
+}
+
+float SpeedManager::getSpeed() {
+
+    float temp = lastSpeed;
+
+    lastSpeed = -1;
+
+    return temp;
+}
+
+void SpeedManager::reset() {
+
+    waitingSecondSensor = false;
+
+    lastSpeed = -1;
 }

@@ -3,12 +3,16 @@ shadow
 
 {
   "state": {
+    "desired": {
+      "speedLimit": 10
+    },
     "reported": {
-      "speed": 42,
-      "speedLimit": 30,
-      "barrier": "closed",
-      "alarm": true,
-      "systemStatus": "online"
+      "deviceId": "speed-01",
+      "systemStatus": "online",
+      "currentSpeed": 3.98,
+      "speedLimit": 10,
+      "alarm": false,
+      "barrier": "open"
     }
   }
 }

@@ -18,7 +18,7 @@ AWSManager::AWSManager(
 
     instance = this;
 
-    desiredSpeedLimit = 30;
+    desiredSpeedLimit = 3;///limite de velocidad
 
     updateTopic =
         "$aws/things/" +
@@ -40,30 +40,52 @@ void AWSManager::init() {
     client.setServer(endpoint, 8883);
 
     client.setCallback(callbackStatic);
+
+    client.setKeepAlive(60);
 }
 
 void AWSManager::connect() {
 
-    if (client.connected()) return;
+    if(client.connected()) {
+        return;
+    }
 
-    String clientId =
-        String(thingName) + "_client";
+    Serial.println("Conectando AWS IoT...");
 
-    if (client.connect(clientId.c_str())) {
-
-        client.subscribe(deltaTopic.c_str());
+    if(client.connect(thingName)) {
 
         Serial.println("AWS conectado");
+
+        String topic =
+            "$aws/things/" +
+            String(thingName) +
+            "/shadow/update/delta";
+
+        client.subscribe(topic.c_str());
+
+        Serial.println("Shadow subscribed");
+
+    } else {
+
+        Serial.print("AWS ERROR rc=");
+
+        Serial.println(client.state());
     }
 }
 
 void AWSManager::loop() {
+    static unsigned long lastReconnect = 0;
 
-    if (!client.connected()) {
+    if (
+        !client.connected()
+        &&
+        millis() - lastReconnect > 5000
+    ) {
+
+        lastReconnect = millis();
+
         connect();
     }
-
-    client.loop();
 }
 
 void AWSManager::callbackStatic(
@@ -104,6 +126,9 @@ void AWSManager::publishState(DeviceState state) {
 
     StaticJsonDocument<256> doc;
 
+    doc["state"]["reported"]["deviceId"] =
+        state.deviceId;
+
     doc["state"]["reported"]["currentSpeed"] =
         state.currentSpeed;
 
@@ -123,5 +148,22 @@ void AWSManager::publishState(DeviceState state) {
 
     serializeJson(doc, buffer);
 
-    client.publish(updateTopic.c_str(), buffer);
+    bool ok = client.publish(
+        updateTopic.c_str(),
+        buffer
+    );
+
+    if(ok) {
+
+        Serial.println("Shadow actualizado");
+
+    } else {
+
+        Serial.println("ERROR publicando shadow");
+    }
+}
+
+bool AWSManager::isConnected() {
+
+    return client.connected();
 }

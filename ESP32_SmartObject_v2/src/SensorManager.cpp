@@ -30,3 +30,13 @@ long SensorManager::getDistance2() {
 
     return sensor2.medir();
 }
+
+long SensorManager::getDistance1Fast() {
+
+    return sensor1.medirFast();
+}
+
+long SensorManager::getDistance2Fast() {
+
+    return sensor2.medirFast();
+}

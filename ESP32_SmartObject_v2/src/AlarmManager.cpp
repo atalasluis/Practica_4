@@ -23,17 +23,22 @@ void AlarmManager::init() {
 
     pinMode(buzzerPin, OUTPUT);
 
+    digitalWrite(buzzerPin, HIGH);
+
     pinMode(led1Pin, OUTPUT);
     pinMode(led2Pin, OUTPUT);
 
-    deactivate();
+    digitalWrite(led1Pin, LOW);
+    digitalWrite(led2Pin, LOW);
+
+    active = false;
 }
 
 void AlarmManager::activate() {
 
     active = true;
 
-    digitalWrite(buzzerPin, LOW);
+    //digitalWrite(buzzerPin, LOW);
 }
 
 void AlarmManager::deactivate() {
@@ -48,9 +53,9 @@ void AlarmManager::deactivate() {
 
 void AlarmManager::update() {
 
-    if (!active) return;
+    if(!active) return;
 
-    if (millis() - lastBlink > blinkInterval) {
+    if(millis() - lastBlink > blinkInterval) {
 
         lastBlink = millis();
 
@@ -58,6 +63,12 @@ void AlarmManager::update() {
 
         digitalWrite(led1Pin, blinkState);
         digitalWrite(led2Pin, blinkState);
+
+        // HIGH trigger
+        digitalWrite(
+            buzzerPin,
+            blinkState ? LOW : HIGH
+        );
     }
 }
 

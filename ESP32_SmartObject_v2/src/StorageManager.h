@@ -5,7 +5,7 @@
 struct SpeedEvent {
     String deviceId;
 
-    float speed;
+    //float speed;
     int speedLimit;
 
     bool exceeded;

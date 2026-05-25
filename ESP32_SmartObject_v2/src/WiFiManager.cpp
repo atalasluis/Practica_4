@@ -19,7 +19,36 @@ void WiFiManager::connect() {
 
     WiFi.begin(ssid, password);
 
-    Serial.println("Conectando WiFi...");
+    Serial.print("Conectando WiFi");
+
+    int retries = 0;
+
+    while(
+        WiFi.status() != WL_CONNECTED &&
+        retries < 20
+    ) {
+
+        delay(500);
+
+        Serial.print(".");
+
+        retries++;
+    }
+
+    Serial.println();
+
+    if(WiFi.status() == WL_CONNECTED) {
+
+        Serial.println("WiFi conectado");
+
+        Serial.print("IP: ");
+
+        Serial.println(WiFi.localIP());
+
+    } else {
+
+        Serial.println("ERROR WIFI");
+    }
 }
 
 void WiFiManager::reconnect() {

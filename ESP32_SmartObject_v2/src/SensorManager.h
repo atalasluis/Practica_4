@@ -20,4 +20,7 @@ public:
 
     long getDistance1();
     long getDistance2();
+
+    long getDistance1Fast();
+    long getDistance2Fast();
 };

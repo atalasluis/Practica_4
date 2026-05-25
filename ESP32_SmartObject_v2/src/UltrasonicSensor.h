@@ -26,4 +26,6 @@ public:
     void init();
 
     long medir();
+
+    float medirFast();
 };

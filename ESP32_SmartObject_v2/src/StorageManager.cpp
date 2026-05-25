@@ -13,7 +13,7 @@ String StorageManager::buildEventJson(
 
     doc["deviceId"] = event.deviceId;
 
-    doc["speed"] = event.speed;
+    //doc["speed"] = event.speed;
 
     doc["speedLimit"] = event.speedLimit;
 

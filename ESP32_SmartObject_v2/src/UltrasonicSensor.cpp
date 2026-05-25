@@ -106,3 +106,30 @@ long UltrasonicSensor::medir() {
 
     return (long)median;
 }
+
+float UltrasonicSensor::medirFast() {
+
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+
+    digitalWrite(trigPin, LOW);
+
+    long duration =
+        pulseIn(
+            echoPin,
+            HIGH,
+            10000
+        );
+
+    if(duration == 0) {
+        return -1;
+    }
+
+    float distance =
+        (duration * 0.0343) / 2.0;
+
+    return distance;
+}
