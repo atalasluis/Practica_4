@@ -56,6 +56,8 @@ public:
     void publishState(DeviceState state);
 
     int desiredSpeedLimit;
+    bool remoteAlarm;
+    bool remoteBarrier;
 
     bool isConnected(); 
 };

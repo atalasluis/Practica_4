@@ -19,18 +19,26 @@
 // WIFI
 // =====================
 
+//const char* ssid = "Galaxy A316AF1";
+//const char* password = "patatata";
+
+//const char* ssid = "TP-Link_22C2";
+//const char* password = "69562495";
+
+//const char* ssid = "TP-Link_Invitados";
+//const char* password = "kebHp50A";
+
 const char* ssid = "Susana";
 const char* password = "12345678";
-
 // =====================
 // AWS
 // =====================
 
 const char* endpoint =
-"a3pyx84p269dfq-ats.iot.us-east-2.amazonaws.com";
+"a3pyx84p269dfq-ats.iot.us-east-1.amazonaws.com";
 
 const char* thingName =
-"thing_test_velocidad";
+"speed-01";
 
 // =====================
 // HC-SR04
@@ -88,7 +96,7 @@ SensorManager sensors(
 SpeedManager speedManager(
     sensors,
     0.12, // distancia entre sensores (m)
-    15    // umbral detección (cm)
+    10    // umbral detección (cm)
 );
 
 BarrierManager barrier(
@@ -118,6 +126,12 @@ StorageManager storage;
 unsigned long lastEventTime = 0;
 
 const int eventCooldown = 3000;
+
+bool localAlarmActive = false;
+
+unsigned long localAlarmStart = 0;
+
+const unsigned long alarmDuration = 5000;
 
 // =====================
 // SETUP
@@ -161,6 +175,15 @@ void setup() {
 // =====================
 
 void loop() {
+
+    // =====================
+    // AWS
+    // =====================
+
+    if (wifi.isConnected()) {
+
+        aws.loop(); // SIEMPRE
+    }
 
     // =====================
     // WIFI
@@ -211,22 +234,29 @@ void loop() {
 
         // ALARMA
 
-        if (exceeded) {
+        if(exceeded) {
 
-            alarmManager.activate();
+            localAlarmActive = true;
 
-            barrier.close();
+            localAlarmStart = millis();
 
             display.showAlarm();
-
-        } else {
-
-            alarmManager.deactivate();
-
-            barrier.open();
-
-            display.showNormal();
         }
+        bool alarmState =
+            localAlarmActive ||
+            aws.remoteAlarm;
+
+        bool barrierState =
+            localAlarmActive ||
+            aws.remoteBarrier;
+            
+        Serial.println("=== LOOP ===");
+        Serial.print("alarmState=");
+        Serial.println(alarmState);
+
+        Serial.print("barrierState=");
+        Serial.println(barrierState);
+        Serial.println("============");
 
         // STATE
 
@@ -238,9 +268,9 @@ void loop() {
 
         state.speedLimit = speedLimit;
 
-        state.alarm = exceeded;
+        state.alarm = alarmState;
 
-        state.barrierClosed = exceeded;
+        state.barrierClosed = barrierState;
 
         state.systemStatus =
             exceeded ? "alarm"
@@ -264,9 +294,6 @@ void loop() {
         event.deviceId =
             thingName;
 
-        //event.speed =
-            //speed;
-
         event.speedLimit =
             speedLimit;
 
@@ -274,10 +301,10 @@ void loop() {
             exceeded;
 
         event.barrierClosed =
-            exceeded;
+            barrierState;
 
         event.alarmActivated =
-            exceeded;
+            alarmState;
 
         event.systemStatus =
             state.systemStatus;
@@ -292,6 +319,73 @@ void loop() {
         Serial.println(json);
     }
 
+
+    // =====================
+    // TEMPORIZADOR ALARMA
+    // =====================
+
+    if(
+        localAlarmActive &&
+        millis() - localAlarmStart >= alarmDuration
+    ) {
+
+        localAlarmActive = false;
+
+        Serial.println("Alarma local finalizada");
+
+        DeviceState state;
+
+        state.deviceId = "speed-01";
+        state.currentSpeed = 0;
+        state.speedLimit = aws.desiredSpeedLimit;
+        state.alarm = aws.remoteAlarm;
+        state.barrierClosed = aws.remoteBarrier;
+        state.systemStatus = "online";
+
+        if(
+            wifi.isConnected() &&
+            aws.isConnected()
+        ) {
+            aws.publishState(state);
+        }
+    }
+
+    // CALCULAR ESTADOS AQUÍ
+
+    bool alarmState =
+        localAlarmActive ||
+        aws.remoteAlarm;
+
+    bool barrierState =
+        localAlarmActive ||
+        aws.remoteBarrier;
+
+    Serial.println("=== LOOP ===");
+    Serial.print("alarmState=");
+    Serial.println(alarmState);
+
+    Serial.print("barrierState=");
+    Serial.println(barrierState);
+    Serial.println("============");
+
+    if(alarmState) {
+
+        alarmManager.activate();
+
+    } else {
+
+        alarmManager.deactivate();
+    }
+
+    if(barrierState) {
+
+        barrier.close();
+
+    } else {
+
+        barrier.open();
+    }
+
     // =====================
     // UPDATE
     // =====================
@@ -300,14 +394,6 @@ void loop() {
 
     display.update();
 
-    // =====================
-    // AWS
-    // =====================
-
-    if (wifi.isConnected()) {
-
-        aws.loop(); // SIEMPRE
-    }
 
     delay(10);
 }

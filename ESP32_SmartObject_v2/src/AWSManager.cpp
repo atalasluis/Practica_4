@@ -18,7 +18,9 @@ AWSManager::AWSManager(
 
     instance = this;
 
-    desiredSpeedLimit = 3;///limite de velocidad
+    desiredSpeedLimit = 3;///limite de velocidad (km/h)
+    remoteAlarm = false;
+    remoteBarrier = false;
 
     updateTopic =
         "$aws/things/" +
@@ -86,6 +88,8 @@ void AWSManager::loop() {
 
         connect();
     }
+
+    client.loop();
 }
 
 void AWSManager::callbackStatic(
@@ -105,6 +109,19 @@ void AWSManager::callback(
     unsigned int length
 ) {
 
+    Serial.println("MENSAJE MQTT RECIBIDO");
+
+    Serial.print("TOPIC: ");
+    Serial.println(topic);
+
+    String message;
+
+    for(int i = 0; i < length; i++) {
+        message += (char)payload[i];
+    }
+
+    Serial.println(message);
+
     StaticJsonDocument<256> doc;
 
     DeserializationError error =
@@ -112,7 +129,7 @@ void AWSManager::callback(
 
     if (error) return;
 
-    if (doc["state"]["speedLimit"]) {
+    if (doc["state"].containsKey("speedLimit")) {
 
         desiredSpeedLimit =
             doc["state"]["speedLimit"];
@@ -120,6 +137,57 @@ void AWSManager::callback(
         Serial.print("Nuevo limite: ");
         Serial.println(desiredSpeedLimit);
     }
+
+    if(doc["state"].containsKey("alarm")) {
+
+        remoteAlarm =
+            doc["state"]["alarm"];
+        Serial.print("Remote alarm: ");
+        Serial.println(remoteAlarm);
+
+        DeviceState state;
+
+        state.deviceId = "speed-01";
+        state.currentSpeed = 0;
+        state.speedLimit = desiredSpeedLimit;
+        state.alarm = remoteAlarm;
+        state.barrierClosed = remoteBarrier;
+        state.systemStatus = "online";
+
+        publishState(state);
+    }
+
+    if(doc["state"].containsKey("barrier")) {
+
+        remoteBarrier =
+            doc["state"]["barrier"];
+        Serial.print("Remote barrier: ");
+        Serial.println(remoteBarrier);
+
+        DeviceState state;
+
+        state.deviceId = "speed-01";
+        state.currentSpeed = 0;
+        state.speedLimit = desiredSpeedLimit;
+        state.alarm = remoteAlarm;
+        state.barrierClosed = remoteBarrier;
+        state.systemStatus = "online";
+
+        publishState(state);
+
+    }
+    Serial.println("------ ESTADO AWS ------");
+
+    Serial.print("desiredSpeedLimit = ");
+    Serial.println(desiredSpeedLimit);
+
+    Serial.print("remoteAlarm = ");
+    Serial.println(remoteAlarm);
+
+    Serial.print("remoteBarrier = ");
+    Serial.println(remoteBarrier);
+
+    Serial.println("------------------------");
 }
 
 void AWSManager::publishState(DeviceState state) {
@@ -139,7 +207,7 @@ void AWSManager::publishState(DeviceState state) {
         state.alarm;
 
     doc["state"]["reported"]["barrier"] =
-        state.barrierClosed ? "closed" : "open";
+        state.barrierClosed;
 
     doc["state"]["reported"]["systemStatus"] =
         state.systemStatus;

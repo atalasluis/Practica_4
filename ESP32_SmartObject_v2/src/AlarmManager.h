@@ -32,4 +32,5 @@ public:
     void update();
 
     bool isActive();
+    
 };

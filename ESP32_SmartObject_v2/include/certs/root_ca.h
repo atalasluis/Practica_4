@@ -1,4 +1,4 @@
-// root_ca.h
+// root_ca.h -> AmazonRootCA1.pem
 #pragma once
 
 const char* AWS_ROOT_CA = R"EOF(
