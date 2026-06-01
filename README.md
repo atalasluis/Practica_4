@@ -1,34 +1,34 @@
 # Practica_4
 
 # 1. Requerimientos Funcionales y No Funcionales
-    * Funcionales
+* Funcionales
       
-      * Detección de vehículos:El sistema deberá detectar la presencia de un vehículo mediante un sensor conectado al ESP32.
+    * Detección de vehículos:El sistema deberá detectar la presencia de un vehículo mediante un sensor conectado al ESP32.
 
-      * Medición de velocidad: El sistema deberá calcular la velocidad del vehículo en tiempo real a partir de los sensores instalados.
+    * Medición de velocidad: El sistema deberá calcular la velocidad del vehículo en tiempo real a partir de los sensores instalados.
 
-      * Comparación con límite de velocidad: El sistema deberá comparar la velocidad detectada con un límite de velocidad configurado remotamente.
+    * Comparación con límite de velocidad: El sistema deberá comparar la velocidad detectada con un límite de velocidad configurado remotamente.
 
-      * Activación de alarma: El sistema deberá activar una alarma sonora cuando la velocidad del vehículo supere el límite establecido.
+    * Activación de alarma: El sistema deberá activar una alarma sonora cuando la velocidad del vehículo supere el límite establecido.
 
-      * Control de barrera automática: El sistema deberá controlar un servomotor que actúa como barrera, cerrándola cuando se detecte exceso de velocidad.
+    * Control de barrera automática: El sistema deberá controlar un servomotor que actúa como barrera, cerrándola cuando se detecte exceso de velocidad.
   
-    * No Funcionales
+* No Funcionales
       
-      * Seguridad: Toda comunicación entre el ESP32 y AWS IoT Core deberá estar cifrada mediante TLS 1.2 usando certificados digitales.
+    * Seguridad: Toda comunicación entre el ESP32 y AWS IoT Core deberá estar cifrada mediante TLS 1.2 usando certificados digitales.
      
-      * Disponibilidad: El sistema deberá mantener conexión con AWS IoT Core con reconexión automática en caso de pérdida de conexión.
+    * Disponibilidad: El sistema deberá mantener conexión con AWS IoT Core con reconexión automática en caso de pérdida de conexión.
       
-      * Eficiencia energética: El ESP32 deberá optimizar el uso de red evitando publicaciones innecesarias y reduciendo tráfico MQTT.
+    * Eficiencia energética: El ESP32 deberá optimizar el uso de red evitando publicaciones innecesarias y reduciendo tráfico MQTT.
       
-      * Mantenibilidad: El código deberá estar modularizado en componentes separados (sensor, AWSManager, actuadores) para facilitar mantenimiento.
+    * Mantenibilidad: El código deberá estar modularizado en componentes separados (sensor, AWSManager, actuadores) para facilitar mantenimiento.
   
 # 2. Diseño del Sistema
-    * Diagrama de bloques
+* Diagrama de bloques
     
-    ```mermaid 
+```mermaid 
     graph LR
-        subgraph Adquisición (Entrada)
+        subgraph Adquisicion Entrada
             S1[Sensor Ultrasónico 1]
             S2[Sensor Ultrasónico 2]
         end
@@ -37,7 +37,7 @@
             ESP[Microcontrolador ESP32\nSpeedManager]
         end
         
-        subgraph Actuación (Salida)
+        subgraph Actuacion Salida
             L[Matriz LEDs / Alarma]
             D[Display LCD 16x2]
             B[Servo Motor Barrera]
@@ -48,13 +48,13 @@
         ESP -->|PWM| B
         ESP -->|I2C| D
         ESP -->|GPIO| L
-    ```
+```
 
-    * Diagrama de circuito
+* Diagrama de circuito
     
-    * Diagrama de arquitectura del sistema
+* Diagrama de arquitectura del sistema
 
-    ```mermaid
+```mermaid
     graph TD
     subgraph Frontend Conversacional
         A[Alexa Echo / App]
@@ -84,11 +84,13 @@
     Rule -- "Invoca" --> L2
     L2 -- "PutItem (Historial)" --> DB2
     
-    ESP <--> "MQTT Shadow Delta/Update" IoT
-    ``` 
+    ESP -->|Shadow Update| IoT
+    IoT -->|Shadow Delta| ESP
+``` 
 
-    * Diagramas estructurales y de comportamiento
-     ```mermaid
+* Diagramas estructurales y de comportamiento
+
+```mermaid
      classDiagram
         class Main {
             +setup()
@@ -121,9 +123,9 @@
         Main --> AWSManager : Usa
         Main --> BarrierManager : Controla
         SpeedManager --> SensorManager : Adquisición
-     ```
+```
 
-     ```mermaid
+```mermaid
      sequenceDiagram
         participant S as Sensores (Edge)
         participant E as ESP32 (Edge)
@@ -143,11 +145,11 @@
         L->>L: Calcula hora, día y genera Timestamp
         L->>DB: PutItem (deviceId, timestamp, speed, etc)
         DB-->>L: 200 OK
-     ```
-    * Diseño de la skill de Alexa
+```
+* Diseño de la skill de Alexa
      
-    ```mermaid
-    diseño de la skill de alexa: stateDiagram-v2
+```mermaid
+    stateDiagram-v2 
     [*] --> LaunchRequest : "Abre sistema de acceso"
     
     LaunchRequest --> LastSpeedIntent : "Cuál es la velocidad"
@@ -164,10 +166,11 @@
     
     RespuestaVoz --> [*] : Cancel/Stop
     RespuestaVoz --> LaunchRequest : Reprompt
-    ```
+```
 
-    * Diseño de reportes (mockups) con información relevante para la toma de decisiones
-    ```json
+* Diseño de reportes (mockups) con información relevante para la toma de decisiones
+
+```json
     {
         "state": {
             "desired": {
@@ -183,10 +186,11 @@
             }
         }
     }
-    ```
-    * Diseño del modelo de datos (tablas, tipos de datos, claves, etc.) para DynamoDB
+```
+
+* Diseño del modelo de datos (tablas, tipos de datos, claves, etc.) para DynamoDB
     
-    ```mermaid
+```mermaid
     erDiagram
     user_devices {
         String user_id PK "Clave de Partición (Alexa Account ID)"
@@ -207,7 +211,7 @@
     }
 
     user_devices ||--o{ speed_events : "Monitorea"
-    ```
+```
 
 # 3. Implementación
   * Código fuente documentado (firmware del Objeto Inteligente y lógica del backend en las funciones Lambda)
