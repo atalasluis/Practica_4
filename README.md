@@ -205,7 +205,6 @@ erDiagram
         string day
     }
 
-    user_devices ||--o{ speed_events : monitorea}
 ```
 Descripción de las tablas
 
