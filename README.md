@@ -191,27 +191,36 @@
 * Diseño del modelo de datos (tablas, tipos de datos, claves, etc.) para DynamoDB
     
 ```mermaid
-    erDiagram
-    user_devices {
-        String user_id PK "Clave de Partición (Alexa Account ID)"
-        String device_id SK "Clave de Ordenación (Identificador físico)"
-        String description "Alias del dispositivo (opcional)"
-    }
-    
+erDiagram
+
     speed_events {
-        String device_id PK "Clave de Partición (Foreign Key lógica)"
-        Number timestamp SK "Clave de Ordenación (Unix Epoch)"
-        Number speed "Velocidad capturada"
-        Boolean exceeded "Flag de infracción"
-        Number speedLimit "Límite configurado en ese instante"
-        Boolean barrierClosed "Estado del actuador"
-        Boolean alarmActivated "Flag de alarma local"
-        Number hour "Hora de analítica"
-        String day "Día de la semana"
+        string device_id PK
+        int timestamp SK
+        int speed
+        bool exceeded
+        int speedLimit
+        bool barrierClosed
+        bool alarmActivated
+        int hour
+        string day
     }
 
-    user_devices ||--o{ speed_events : "Monitorea"}
+    user_devices ||--o{ speed_events : monitorea}
 ```
+Descripción de las tablas
+
+| Campo          | Tipo    | Clave | Descripción                                            |
+| -------------- | ------- | ----- | ------------------------------------------------------ |
+| device_id      | String  | PK    | Identificador del dispositivo que generó el evento.    |
+| timestamp      | Number  | SK    | Marca temporal Unix Epoch del evento.                  |
+| speed          | Number  | -     | Velocidad capturada por el sensor.                     |
+| exceeded       | Boolean | -     | Indica si la velocidad excedió el límite configurado.  |
+| speedLimit     | Number  | -     | Límite de velocidad vigente al momento de la medición. |
+| barrierClosed  | Boolean | -     | Estado de la barrera durante el evento.                |
+| alarmActivated | Boolean | -     | Estado de la alarma durante el evento.                 |
+| hour           | Number  | -     | Hora del día utilizada para análisis y reportes.       |
+| day            | String  | -     | Día de la semana asociado al evento.                   |
+
 
 # 3. Implementación
   * Código fuente documentado (firmware del Objeto Inteligente y lógica del backend en las funciones Lambda)
