@@ -210,7 +210,7 @@
         String day "Día de la semana"
     }
 
-    user_devices ||--o{ speed_events : "Monitorea"
+    user_devices ||--o{ speed_events : "Monitorea"}
 ```
 
 # 3. Implementación
