@@ -52,6 +52,8 @@
 
 * Diagrama de circuito
     
+![Diagrama del circuito](media/diagrama.png)
+
 * Diagrama de arquitectura del sistema
 
 ```mermaid
