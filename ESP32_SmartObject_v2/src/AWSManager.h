@@ -55,6 +55,8 @@ public:
 
     void publishState(DeviceState state);
 
+    void publishEvent(DeviceState state);
+
     int desiredSpeedLimit;
     bool remoteAlarm;
     bool remoteBarrier;

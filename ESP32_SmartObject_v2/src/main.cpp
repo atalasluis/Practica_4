@@ -347,6 +347,7 @@ void loop() {
             aws.isConnected()
         ) {
             aws.publishState(state);
+            aws.publishEvent(state);
         }
     }
 

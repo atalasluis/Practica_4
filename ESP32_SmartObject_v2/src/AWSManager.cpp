@@ -231,6 +231,31 @@ void AWSManager::publishState(DeviceState state) {
     }
 }
 
+void AWSManager::publishEvent(DeviceState state) {
+
+    StaticJsonDocument<256> doc;
+
+    // Estructura plana exacta que espera tu Lambda Ingestora
+    doc["currentSpeed"] = state.currentSpeed;
+    doc["speedLimit"] = state.speedLimit;
+    doc["alarm"] = state.alarm;
+
+    char buffer[256];
+    serializeJson(doc, buffer);
+
+    // Tópico EXACTO configurado en tu Regla SQL de AWS IoT Core
+    bool ok = client.publish(
+        "speed-monitor/data",
+        buffer
+    );
+
+    if(ok) {
+        Serial.println("Evento enviado a DynamoDB!");
+    } else {
+        Serial.println("ERROR publicando evento analítico");
+    }
+}
+
 bool AWSManager::isConnected() {
 
     return client.connected();
