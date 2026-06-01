@@ -194,8 +194,8 @@
 erDiagram
 
     speed_events {
-        string device_id PK
-        int timestamp SK
+        string device_id
+        int timestamp
         int speed
         bool exceeded
         int speedLimit
