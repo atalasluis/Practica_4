@@ -19,8 +19,8 @@
 // WIFI
 // =====================
 
-//const char* ssid = "Galaxy A316AF1";
-//const char* password = "patatata";
+const char* ssid = "Galaxy A316AF1";
+const char* password = "patatata";
 
 //const char* ssid = "TP-Link_22C2";
 //const char* password = "69562495";
@@ -28,8 +28,8 @@
 //const char* ssid = "TP-Link_Invitados";
 //const char* password = "kebHp50A";
 
-const char* ssid = "Susana";
-const char* password = "12345678";
+//const char* ssid = "Susana";
+//const char* password = "12345678";
 // =====================
 // AWS
 // =====================
