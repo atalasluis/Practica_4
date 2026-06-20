@@ -2,17 +2,17 @@
 
 #include <WiFi.h>
 
-class WiFiManager {
+class NetworkManager {
 private:
-    const char* ssid;
-    const char* password;
-
+    const char* portalSSID;
     unsigned long lastReconnectAttempt;
 
+    unsigned long lossTime; 
+    bool          trackingLoss;
+
 public:
-    WiFiManager(
-        const char* ssid,
-        const char* password
+    NetworkManager(
+        const char* apName="Vias_Speed_Portal"
     );
 
     void connect();

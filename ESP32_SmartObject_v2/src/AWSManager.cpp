@@ -11,7 +11,7 @@ AWSManager* AWSManager::instance = nullptr;
 AWSManager::AWSManager(
     const char* endpoint,
     const char* thingName
-)
+) 
 : client(net),
   endpoint(endpoint),
   thingName(thingName) {
@@ -235,7 +235,6 @@ void AWSManager::publishEvent(DeviceState state) {
 
     StaticJsonDocument<256> doc;
 
-    // Estructura plana exacta que espera tu Lambda Ingestora
     doc["currentSpeed"] = state.currentSpeed;
     doc["speedLimit"] = state.speedLimit;
     doc["alarm"] = state.alarm;
@@ -243,7 +242,6 @@ void AWSManager::publishEvent(DeviceState state) {
     char buffer[256];
     serializeJson(doc, buffer);
 
-    // Tópico EXACTO configurado en tu Regla SQL de AWS IoT Core
     bool ok = client.publish(
         "speed-monitor/data",
         buffer
