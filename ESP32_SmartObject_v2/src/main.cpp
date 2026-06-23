@@ -42,7 +42,7 @@ AWSManager     aws(endpoint, thingName);
 SensorManager  sensors(TRIG1, ECHO1, TRIG2, ECHO2);
 StorageManager storage;
 
-SpeedManager   speedManager(sensors, 0.12, 10); // 12cm distancia, 10cm umbral
+SpeedManager   speedManager(sensors, 0.12, 16); // 12cm distancia, 16cm umbral
 BarrierManager barrier(SERVO_PIN, 90, 0);
 AlarmManager   alarmManager(BUZZER_PIN, LED1_PIN, LED2_PIN);
 DisplayManager display(0x27, 16, 2);
