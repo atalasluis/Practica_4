@@ -1,0 +1,168 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "practica tres",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "HelloWorldIntent",
+                    "slots": [],
+                    "samples": [
+                        "hola",
+                        "como estás",
+                        "di hola mundo",
+                        "di hola",
+                        "hola mundo"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "TurnOffIntent",
+                    "slots": [],
+                    "samples": [
+                        "apagalo",
+                        "Apaga la luz",
+                        "Desactiva el indicador",
+                        "Apaga el led"
+                    ]
+                },
+                {
+                    "name": "BlinkDangerIntent",
+                    "slots": [
+                        {
+                            "name": "dispositivo",
+                            "type": "TIPO_DISPOSiTIVO"
+                        }
+                    ],
+                    "samples": [
+                        "peligro en {dispositivo}",
+                        "modo peligro en {dispositivo}",
+                        "modo emergencia en {dispositivo}",
+                        "enciende la alerta en {dispositivo}",
+                        "activa el modo peligro en {dispositivo}",
+                        "parpadea"
+                    ]
+                },
+                {
+                    "name": "LastSpeedIntent",
+                    "slots": [
+                        {
+                            "name": "dispositivo",
+                            "type": "TIPO_DISPOSiTIVO"
+                        }
+                    ],
+                    "samples": [
+                        "última velocidad de {dispositivo}",
+                        "A qué velocidad pasó el último auto de {dispositivo}",
+                        "Dime la última velocidad detectada de {dispositivo}",
+                        "Cuál fue la última velocidad de {dispositivo}"
+                    ]
+                },
+                {
+                    "name": "ChangeSpeedLimitIntent",
+                    "slots": [
+                        {
+                            "name": "limite",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "límite en {limite} ",
+                        "Pon el límite en {limite} ",
+                        "Establece la velocidad en {limite}",
+                        "Cambia el límite a {limite}"
+                    ]
+                },
+                {
+                    "name": "OpenBarrierIntent",
+                    "slots": [
+                        {
+                            "name": "dispositivo",
+                            "type": "TIPO_DISPOSiTIVO"
+                        }
+                    ],
+                    "samples": [
+                        "Permite el paso de {dispositivo}",
+                        "Levanta la barrera de {dispositivo}",
+                        "Abre la barrera de {dispositivo}"
+                    ]
+                },
+                {
+                    "name": "SystemCheckIntent",
+                    "slots": [
+                        {
+                            "name": "dispositivo",
+                            "type": "TIPO_DISPOSiTIVO"
+                        }
+                    ],
+                    "samples": [
+                        "Verifica las alertas de {dispositivo}",
+                        "Cuál es el estado del sistema de {dispositivo}",
+                        "El sistema de {dispositivo} está en alarma"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "TIPO_DISPOSiTIVO",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "avenida principal"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "zona residencial"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "zona escolar"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "salida"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "entrada"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "calle3"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "calle2"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "calle1"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
