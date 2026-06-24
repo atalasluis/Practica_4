@@ -1,0 +1,18 @@
+{
+    "ruleArn": "arn:aws:iot:us-east-1:783648733158:rule/ProcesarTelemetriaVelocidad",
+    "rule": {
+        "ruleName": "ProcesarTelemetriaVelocidad",
+        "sql": "SELECT *, clientid() as device_id FROM 'speed-monitor/data'",
+        "description": "",
+        "createdAt": "2026-05-25T21:12:01+00:00",
+        "actions": [
+            {
+                "lambda": {
+                    "functionArn": "arn:aws:lambda:us-east-1:783648733158:function:SpeedDataIngestor"
+                }
+            }
+        ],
+        "ruleDisabled": false,
+        "awsIotSqlVersion": "2016-03-23"
+    }
+}
